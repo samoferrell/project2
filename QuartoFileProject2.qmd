@@ -30,7 +30,17 @@ search_show <- function(url = "https://api.tvmaze.com/shows", show_name = NULL, 
   }
   }
 
-data <- search_show(url = "https://api.tvmaze.com/shows")
-View(data)
+show_data <- search_show(url = "https://api.tvmaze.com/shows")
+BreakingBad <- search_show(show_name = "Breaking Bad")
+View(show_data)
+```
+
+Contingency Tables:
+```{r}
+CT <- table(show_data$type, show_data$averageRuntime, show_data$status)
+CT
+```
+```{r}
+table(BreakingBad$)
 ```
 
