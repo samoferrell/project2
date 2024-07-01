@@ -23,3 +23,24 @@ str(id_info, max.level = 1)
 parsed <- fromJSON(rawToChar(id_info$content))
 info <- tibble::as_tibble(parsed)
 View(info)
+
+search_show <- function(url = "https://api.tvmaze.com/shows", show_name, endpoint){
+  id_info <- httr::GET(url)
+  parsed <- fromJSON(rawToChar(id_info$content))
+  all_shows <- tibble::as_tibble(parsed)
+    if (!is.null(name)){
+    subsetted <- subset(all_shows, name == show_name)
+    id <- subsetted$id
+    new_url <- paste(url, id, endpoint, sep = "/")
+    id_info_specific <- httr::GET(new_url)
+    parsed_specific <- fromJSON(rawToChar(id_info_specific$content))
+    info_specific <- tibble::as_tibble(parsed_specific)
+    return(info_specific)
+    }
+  else{
+    return(all_shows)
+  }
+  }
+
+data <- search_show(url = "https://api.tvmaze.com/shows", show_name = "Lost", endpoint = "episodes")  
+View(data)
