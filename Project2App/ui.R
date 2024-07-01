@@ -16,7 +16,9 @@ shinyUI(fluidPage(
       br(),
       selectInput("endpoint", label = "What are you interested in?", 
                   choices = c("episodes", "cast", "seasons"),
-                  selected = "cast")),
+                  selected = "cast"),
+      br(),
+      actionButton("submit", "GO!")),
     
     mainPanel(
       dataTableOutput("summary")

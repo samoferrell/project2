@@ -4,12 +4,16 @@ library(tidyverse)
 library(DT)
 library(jsonlite)
 library(tidyr)
-data("GermanCredit")
-shinyServer(function(input, output) {
+shinyServer(function(input, output, session) {
   
 output$summary <- DT::renderDataTable({
   endpoint <- input$endpoint
   show_name <- input$show_name
+  
+  observeEvent(input$submit, {
+    updateTextInput(session, "show_name", value = input$show_name) 
+    updateSelectInput(session, "endpoint", selected = input$endpoint)})
+  
   url = "https://api.tvmaze.com/shows"
   id_info <- httr::GET(url)
   parsed <- fromJSON(rawToChar(id_info$content))
