@@ -7,16 +7,16 @@ library(caret)
 shinyUI(fluidPage(
   
   # Application title
-  titlePanel("Project 2"),
+  titlePanel("Project 2 - TV Shows!"),
   tabsetPanel(
     # About Tab
     tabPanel("About",
     mainPanel(
-      h2("Purpose of the App"),
+      h3("Purpose of the App"),
       p("The purpose is to:"),
-      h2("Data and Source"),
+      h3("Data and Source"),
       p("THe data is "),
-      tags$img(src = "tvshowcollage.png", width = "400px", height = "300px")
+      tags$img(src = 'tvshowcollage.png', align = "center", width = "600px", length = "900px")
       
 
     )         
@@ -38,7 +38,7 @@ shinyUI(fluidPage(
                          selectInput("endpoint", label = "What are you interested in?", 
                                      choices = c("general", "episodes", "cast", "seasons"),
                                      selected = "general"),
-                        br(),
+                        br()
                          ),
         conditionalPanel("input.RB == 'all'",
                          sliderInput("min_show", "Minimum Show Rating (0 to 10)" ,
