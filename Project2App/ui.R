@@ -9,7 +9,20 @@ shinyUI(fluidPage(
   # Application title
   titlePanel("Project 2"),
   tabsetPanel(
-   tabPanel("Querying Show Data"
+    # About Tab
+    tabPanel("About",
+    mainPanel(
+      h2("Purpose of the App"),
+      p("The purpose is to:"),
+      h2("Data and Source"),
+      p("THe data is "),
+      tags$img(src = "tvshowcollage.png", width = "400px", height = "300px")
+      
+
+    )         
+    ),
+    # Data Download Tab
+   tabPanel("Data Query and Download",
   sidebarLayout(
     sidebarPanel(
       radioButtons("RB", "Select a Choice Below",
@@ -46,5 +59,8 @@ shinyUI(fluidPage(
       downloadButton("downloadData", "Download CSV")),
     mainPanel(
       dataTableOutput("summary")
-    )))) 
+    )
+    )),
+  tabPanel("Data Exploration Tab"))))
+  
 
