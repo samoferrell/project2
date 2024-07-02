@@ -7,23 +7,26 @@ library(tidyr)
 shinyServer(function(input, output, session) {
   endpoint <- eventReactive(input$submit, {input$endpoint})
   show_name <- eventReactive(input$submit, {input$show_name})
-
+  RB <- eventReactive(input$submit, {input$RB})
 output$summary <- DT::renderDataTable({
-
 
   url <- "https://api.tvmaze.com/shows"
   id_info <- httr::GET(url)
   parsed <- fromJSON(rawToChar(id_info$content))
-  all_shows <- tibble::as_tibble(parsed) |> 
-    select(!summary)
+  all_shows <- tibble::as_tibble(parsed)  |> 
+    select(!c(summary,url,id))
   subsetted <- subset(all_shows, name == show_name())
   id <- subsetted$id
   
-  if (input$RB == "all"){
+  if (RB() == "all"){
+    output$columns <- renderUI({
+    checkboxGroupInput("CB", "Select Columns to Keep", choices = colnames(all_shows)) })
     return(all_shows)
   }
   
   if (endpoint() == "general") {
+    output$columns <- renderUI({
+      checkboxGroupInput("CB", "Select Columns to Keep", choices = colnames(subsetted)) })
      return(subsetted)} 
   else {
     new_url <- paste0(url, "/", id, "/", endpoint())}
@@ -37,9 +40,15 @@ output$summary <- DT::renderDataTable({
       cast_info <- info_specific |>
         unnest_wider(col = person, names_sep = "_") |>
         unnest_wider(col = character, names_sep = "_")
-      return(cast_info)
+        output$columns <- renderUI({
+        checkboxGroupInput("CB", "Select Columns to Keep", choices = colnames(cast_info)) })
+        return(cast_info)
       }
       
-  else {return(info_specific)}
+  else {
+    output$columns <- renderUI({
+      checkboxGroupInput("CB", "Select Columns to Keep", choices = colnames(info_specific)) })
+    return(info_specific)}
+  
 })
 })

@@ -12,16 +12,26 @@ shinyUI(fluidPage(
   # Sidebar with a slider input for number of bins
   sidebarLayout(
     sidebarPanel(
-      radioButtons("RB", "Select a Choice Below",choiceNames = c("Return All Shows","Specific Show Search"), choiceValues = c("all", "specific")),
+      radioButtons("RB", "Select a Choice Below",
+                   choiceNames = c("Return All Shows","Specific Show Search"), 
+                   choiceValues = c("all", "specific")),
       
-        conditionalPanel("input.RB == 'specific'", textInput("show_name", "Name of Show", value = "", width = NULL, placeholder = "Enter show name"),
+        conditionalPanel("input.RB == 'specific'", 
+                         textInput("show_name", "Name of Show", 
+                                   value = "", 
+                                   width = NULL, 
+                                   placeholder = "Enter show name"),
                          br(),
                          selectInput("endpoint", label = "What are you interested in?", 
                                      choices = c("general", "episodes", "cast", "seasons"),
-                                     selected = "general")),
+                                     selected = "general"),
+                        br(),
+                         ),
+      uiOutput("columns"),
+      
+    
       br(),
       actionButton("submit", "GO!")),
-    
     mainPanel(
       dataTableOutput("summary")
-    ))))
+    )))) 

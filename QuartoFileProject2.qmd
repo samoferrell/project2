@@ -5,11 +5,11 @@ editor: visual
 ---
 
 ## Information about the API
-Link: https://www.tvmaze.com/api
-This API gives us information about famous TV Shows.
-Our endpoints are /shows/id/cast,episodes,images,crew,seasons
+
+Link: https://www.tvmaze.com/api This API gives us information about famous TV Shows. Our endpoints are /shows/id/cast,episodes,images,crew,seasons
 
 ## Function Writing:
+
 ```{r}
 library(jsonlite)
 search_show <- function(url = "https://api.tvmaze.com/shows", show_name = NULL, endpoint = NULL){
@@ -36,11 +36,12 @@ View(show_data)
 ```
 
 Contingency Tables:
+
 ```{r}
 CT <- table(show_data$type, show_data$averageRuntime, show_data$status)
 CT
 ```
+
 ```{r}
 table(BreakingBad$)
 ```
-

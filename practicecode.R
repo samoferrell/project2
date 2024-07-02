@@ -44,3 +44,8 @@ search_show <- function(url = "https://api.tvmaze.com/shows", show_name, endpoin
 
 data <- search_show(url = "https://api.tvmaze.com/shows", show_name = "Breaking Bad", endpoint = "cast")  
 View(data)
+url <- "https://api.tvmaze.com/shows"
+id_info <- httr::GET(url)
+parsed <- fromJSON(rawToChar(id_info$content))
+all_shows <- tibble::as_tibble(parsed)
+colnames(all_shows)
