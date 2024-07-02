@@ -8,6 +8,12 @@ editor: visual
 
 Link: https://www.tvmaze.com/api This API gives us information about famous TV Shows. Our endpoints are /shows/id/cast,episodes,images,crew,seasons
 
+Row Manipulations:
+All - rating_average
+episodes - rating
+cast - person_gender
+seasons_
+
 ## Function Writing:
 
 ```{r}

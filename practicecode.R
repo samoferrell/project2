@@ -22,7 +22,11 @@ id_info <- httr::GET(url_id)
 str(id_info, max.level = 1)
 parsed <- fromJSON(rawToChar(id_info$content))
 info <- tibble::as_tibble(parsed)
-View(info)
+library(tidyr)
+episode_info <- info |>
+  unnest_wider(rating, names_sep = "_") |>
+  select(name, season, number, type, airdate, runtime, rating_average)
+View(episode_info)
 
 search_show <- function(url = "https://api.tvmaze.com/shows", show_name, endpoint){
   id_info <- httr::GET(url)
@@ -42,10 +46,13 @@ search_show <- function(url = "https://api.tvmaze.com/shows", show_name, endpoin
   }
   }
 
-data <- search_show(url = "https://api.tvmaze.com/shows", show_name = "Breaking Bad", endpoint = "cast")  
+data <- search_show(url = "https://api.tvmaze.com/shows", show_name = "Breaking Bad", endpoint = "episodes")  
 View(data)
 url <- "https://api.tvmaze.com/shows"
 id_info <- httr::GET(url)
 parsed <- fromJSON(rawToChar(id_info$content))
 all_shows <- tibble::as_tibble(parsed)
 colnames(all_shows)
+
+
+#############################################
