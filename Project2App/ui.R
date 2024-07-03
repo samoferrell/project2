@@ -13,9 +13,17 @@ shinyUI(fluidPage(
     tabPanel("About",
     mainPanel(
       h3("Purpose of the App"),
-      p("The purpose is to:"),
+      p("The purpose of the app is to create an environment for the user to analyze data about shows."),
       h3("Data and Source"),
-      p("THe data is "),
+      p("The data comes from https://www.tvmaze.com/api. This API was made to allow those interested to
+        bring information about TV Shows to their website or app. This API has many endpoints and allows
+        the user to access general information about some of the most popular shows. Then, for each show,
+        users can access information about the episodes, seasons, cast, and much more. "),
+      h3("Tabs"),
+      p("There are two other tabs within this app. In the 'Data Query and Download' tab, users are 
+      able to query through the TV Show API and subset by rows and columns! Then, they are able to download the data they have subsetted. Within the 
+        'Data Exploration' tab, users are able to choose variables/ combinations of variables that are 
+        summarized via numerical and graphical summaries."),
       tags$img(src = 'tvshowcollage.png', align = "center", width = "600px", length = "900px")
       
 
@@ -43,11 +51,11 @@ shinyUI(fluidPage(
         conditionalPanel("input.RB == 'all'",
                          sliderInput("min_show", "Minimum Show Rating (0 to 10)" ,
                                      min=0, max=10,value=0 ,animate=FALSE,step=0.1)),
-        conditionalPanel("input.endpoint == 'episodes'",
+        conditionalPanel("input.endpoint == 'episodes' && input.RB == 'specific'",
                        sliderInput("min_ep", "Minimum Episode Rating (0 to 10)" ,
                                    min=0, max=10,value=0 ,animate=FALSE,step=0.1)),
       
-        conditionalPanel("input.endpoint == 'cast'", 
+        conditionalPanel("input.endpoint == 'cast' && input.RB == 'specific'", 
                          selectInput("gender", label = "Gender to keep?", 
                                      choices = c("Both", "Male", "Female"),
                                      selected = "Both")),
@@ -56,6 +64,7 @@ shinyUI(fluidPage(
     
       br(),
       actionButton("submit", "GO!"),
+      p("note: hitting GO! will reset the column checkboxes for easy refreshing :)"),
       downloadButton("downloadData", "Download CSV")),
     mainPanel(
       dataTableOutput("summary")
