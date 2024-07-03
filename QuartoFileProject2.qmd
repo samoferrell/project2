@@ -98,6 +98,13 @@ all_genres <- sort(unique(unlisted))
 
 ```         
 average show rating based on premiered year - grouped and colored by type
+```
+```{r}
+year_data <- show_data |>
+mutate(year = substr(premiered,1,4)) |>
+select(name, year)
+```
+
 
 episode trend rating faceted by season
 

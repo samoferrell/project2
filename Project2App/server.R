@@ -190,4 +190,28 @@ output$tables <- renderPrint({
   else {
     print("Select 2 to 3 variables")}
 })
+
+###### Plots #########
+output$show_rating_plot <- renderPlot({
+  
+ # average show rating based on premiered year - grouped and colored by type
+  url <- "https://api.tvmaze.com/shows"
+  id_info <- httr::GET(url)
+  parsed <- fromJSON(rawToChar(id_info$content))
+  all_shows <- tibble::as_tibble(parsed)
+  data <- all_shows |>
+    unnest_wider(rating, names_sep = "_") |>
+    mutate(year = substr(premiered,1,4))
+  
+  ggplot(data, aes(x = year, y = rating_average)) +
+  geom_point()
+  
+    
+})
+
+
+
+
+
+
 })

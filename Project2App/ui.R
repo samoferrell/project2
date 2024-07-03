@@ -104,8 +104,11 @@ shinyUI(fluidPage(
                verbatimTextOutput("summary_table")),
                conditionalPanel("input.tabs == 'tables'",
                                 h4("Contingiency Tables"),
-                                verbatimTextOutput("tables"))
-             ),
+                                verbatimTextOutput("tables")),
+               conditionalPanel("input.tabs == 'plots'",
+                                plotOutput("show_rating_plot"))
+               
+               ),
              
                
              ))
