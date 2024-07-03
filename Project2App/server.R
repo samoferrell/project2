@@ -5,6 +5,8 @@ library(DT)
 library(jsonlite)
 library(tidyr)
 library(purrr)
+library(see)
+library(ggplot2)
 
 shinyServer(function(input, output, session) {
 # all my reactive events are below:
@@ -195,18 +197,43 @@ output$tables <- renderPrint({
 output$show_rating_plot <- renderPlot({
   
  # average show rating based on premiered year - grouped and colored by type
+#  url <- "https://api.tvmaze.com/shows"
+#  id_info <- httr::GET(url)
+#  parsed <- fromJSON(rawToChar(id_info$content))
+#  all_shows <- tibble::as_tibble(parsed)
+#  data <- all_shows |>
+#    unnest_wider(rating, names_sep = "_") |>
+#    mutate(year = substr(premiered,1,4))
+  
+#  ggplot(data, aes(x = year, y = rating_average)) +
+#  geom_point()
+
   url <- "https://api.tvmaze.com/shows"
   id_info <- httr::GET(url)
   parsed <- fromJSON(rawToChar(id_info$content))
   all_shows <- tibble::as_tibble(parsed)
-  data <- all_shows |>
+  
+  # I will now allow the user to filter by adjusting a slider and hitting "GO!"
+  
+  # to find general information about a single show, I will subset the show data by matching the name and then ID  
+  subsetted <- subset(all_shows, name == input$show_eps)
+  id <- subsetted$id 
+  new_url <- paste0(url, "/", id, "/", "episodes")
+  ep_info <- httr::GET(new_url)
+  ep_parsed <- fromJSON(rawToChar(ep_info$content))
+  all_eps <- tibble::as_tibble(ep_parsed)
+  episode_ratings <- all_eps |>
     unnest_wider(rating, names_sep = "_") |>
-    mutate(year = substr(premiered,1,4))
+    mutate(season = as.factor(season))
   
-  ggplot(data, aes(x = year, y = rating_average)) +
-  geom_point()
-  
-    
+  ggplot(episode_ratings, aes(x = season, y = rating_average, 
+                              group = season,
+                              fill = season)) +
+    geom_violindot(fill_dots = "black") +
+    scale_fill_material_d()+
+    xlab ("Season Number") +
+    ylab ("Average Episode Rating") +
+    labs(title = "Episode Rating Distribution by Season")   
 })
 
 

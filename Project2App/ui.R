@@ -106,6 +106,10 @@ shinyUI(fluidPage(
                                 h4("Contingiency Tables"),
                                 verbatimTextOutput("tables")),
                conditionalPanel("input.tabs == 'plots'",
+                                textInput("show_eps", "Name of Show", 
+                                          value = "", 
+                                          width = NULL, 
+                                          placeholder = "Enter show name, try: 'Game of Thrones'"),
                                 plotOutput("show_rating_plot"))
                
                ),

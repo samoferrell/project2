@@ -100,16 +100,49 @@ all_genres <- sort(unique(unlisted))
 average show rating based on premiered year - grouped and colored by type
 ```
 ```{r}
-year_data <- show_data |>
-mutate(year = substr(premiered,1,4)) |>
-select(name, year)
+  data <- show_data |>
+    unnest_wider(rating, names_sep = "_") |>
+    mutate(year = substr(premiered,1,4))
+  
+ggplot(data, aes(x = year, y = rating_average, color = type, group = type)) +
+  geom_point() 
+
 ```
 
 
 episode trend rating faceted by season
+```{r}
+library(tidyverse)
+BBepisodes <- search_show(show_name = "House", endpoint = "episodes")
+episode_ratings <- BBepisodes |>
+      unnest_wider(rating, names_sep = "_") |>
+      mutate(season = as.factor(season))
+ggplot(episode_ratings, aes(x = season, y = rating_average)) +
+  geom_point() 
+```
+
+```{r}
+library(see)
+library(ggplot2)
+
+ggplot(episode_ratings, aes(x = season, y = rating_average, 
+                            group = season,
+                            fill = season)) +
+  geom_violindot(fill_dots = "black") +
+  scale_fill_material_d()+
+  xlab ("Season Number") +
+  ylab ("Average Episode Rating") +
+  labs(title = "Episode Rating Distribution by Season")
+
+  
+
+  
+
+```
+
 
 genre count for shows (after viewing it may not work, too many distinct genre combinations)
-```
+
 
 
 ```{r}
