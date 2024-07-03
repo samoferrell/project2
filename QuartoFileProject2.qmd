@@ -8,11 +8,7 @@ editor: visual
 
 Link: https://www.tvmaze.com/api This API gives us information about famous TV Shows. Our endpoints are /shows/id/cast,episodes,images,crew,seasons
 
-Row Manipulations:
-All - rating_average
-episodes - rating
-cast - person_gender
-seasons_
+Row Manipulations: All - rating_average episodes - rating cast - person_gender seasons\_
 
 ## Function Writing:
 
@@ -52,44 +48,97 @@ CT <- table(show_data$type, show_data$network$country$name, show_data$schedule$d
 
 – You should create some contingency tables
 
-     type(scripted reality) and day shown and country name
-     rating range and runtime / type
-    
-     
+```         
+ type(scripted reality) and day shown and country name
+ rating range and runtime / type
+
+ 
+```
+
 – You should create numerical summaries for some quantitative variables at each setting of some of your categorical variables
 
-      average show rating based on genre specified
+```         
+  average show rating based on genre specified
+```
+```{r}
+avg_genre_rating <- function(genre_vector, data = show_data){
+filtered <- data |>
+    unnest_wider(rating, names_sep = "_") |>
+    select(name,genres,rating_average) |>
+    filter(map_lgl(genres, ~ all(genre_vector %in% .x)))
+average <- mean(filtered$rating_average)
+return(list("data" = filtered, "average" = average))
+}
+```
 
+```{r}
+test <- avg_genre_rating(genre_vector = c("Crime","Action"))
+View(test$data)
+```
+
+```{r}
+library(purrr)
+data_test <- show_data |>
+    unnest_wider(rating, names_sep = "_") |>
+    select(name,genres,rating_average) |>
+    filter(map_lgl(genres, ~ all(c("Drama", "Crime") %in% .x)))
+average <- mean(data_test$rating_average)
+average
+```
+
+
+
+Trying to extract all unique values of genre:
+```{r}
+unlisted <- unlist(show_data$genres)
+all_genres <- sort(unique(unlisted))
+```
 
 – You should create at least four plots utilizing coloring, grouping, etc. All plots should have nice labels and titles.
 
-    average show rating based on premiered year - grouped and colored by type
-    
-    episode trend rating faceted by season
-    
-    genre count for shows
-    
-    ** special plot **
-    half violin - half dot plot = vertical distribution for age and 
-    grouped by gender of cast of a show
+```         
+average show rating based on premiered year - grouped and colored by type
 
-∗ At least one plot that you create should be a plot that we didn’t cover in class (say a heatmap
-or something like that - depends on your data - lots of good examples to consider here
-https://exts.ggplot2.tidyverse.org/gallery/)
+episode trend rating faceted by season
+
+genre count for shows (after viewing it may not work, too many distinct genre combinations)
+```
 
 
+```{r}
+show_data %>%
+  distinct(name, .keep_all=TRUE) %>%
+  ggplot(aes(x=genres)) +
+    geom_bar() +
+    geom_text(stat='count', aes(label=after_stat(count)), vjust=-1) +
+    scale_x_upset(n_intersections = 20, scale_name = NULL) +
+    scale_y_continuous(breaks = NULL, lim = c(0, 100), name = "")
+```
+```{r}
+View(tidy_movies)
+```
 
-A Data Exploration tab. The tab should
-– Allow the user to choose variables/combinations of variables that are summarized via numerical and graphical summaries
-2
-∗ The user should be able to change the type of plot shown and type of summary reported (this
-may correspond to different types of data that are downloaded)
-∗ The user should be able to do some kind of faceting on a plot
 
-for all show data I can do: 
-pick your x 
-
-
-
+```{r}
+tidy_movies %>%
+  distinct(title, year, length, .keep_all=TRUE) %>%
+  ggplot(aes(x=Genres)) +
+    geom_bar() +
+    geom_text(stat='count', aes(label=after_stat(count)), vjust=-1) +
+    scale_x_upset(n_intersections = 20, scale_name = NULL) +
+    scale_y_continuous(breaks = NULL, lim = c(0, 1350), name = "")
+```
 
 
+
+
+** special plot **
+half violin - half dot plot = vertical distribution for age and 
+grouped by gender of cast of a show
+```
+
+∗ At least one plot that you create should be a plot that we didn’t cover in class (say a heatmap or something like that - depends on your data - lots of good examples to consider here https://exts.ggplot2.tidyverse.org/gallery/)
+
+A Data Exploration tab. The tab should – Allow the user to choose variables/combinations of variables that are summarized via numerical and graphical summaries 2 ∗ The user should be able to change the type of plot shown and type of summary reported (this may correspond to different types of data that are downloaded) ∗ The user should be able to do some kind of faceting on a plot
+
+for all show data I can do: pick your x

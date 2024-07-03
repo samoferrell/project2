@@ -13,6 +13,7 @@ shinyServer(function(input, output, session) {
   RB <- eventReactive(input$submit, {input$RB})
   min_show <- eventReactive(input$submit, {input$min_show})
   min_ep <- eventReactive(input$submit, {input$min_ep})
+  #selected_genres <- input$selected_genres
   
 # I will create my data to generate when the submit button is hit. 
 # This will also allow the data to be downloaded because I can call
@@ -127,4 +128,22 @@ output$downloadData <- downloadHandler(
     write.csv(reactive_data() |> select(input$CB), 
               file, row.names = FALSE)
   })
+
+# TAB 3
+###################################
+
+###### Numerical Show Summaries #########
+#output$genre_data DT::renderDataTable({
+#url <- "https://api.tvmaze.com/shows"
+#id_info <- httr::GET(url)
+#parsed <- fromJSON(rawToChar(id_info$content))
+#all_shows <- tibble::as_tibble(parsed)
+#filtered <- all_shows |>
+ # unnest_wider(rating, names_sep = "_") |>
+  # now I will select only the columns that are of interest.
+  #select(name,genres,rating_average) |>
+  #filter(map_lgl(genres, ~ all(genre_vector %in% .x)))
+
+#average <- mean(filtered$rating_average)
+
 })
