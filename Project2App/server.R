@@ -229,10 +229,11 @@ output$show_rating_plot <- renderPlot({
   ggplot(episode_ratings, aes(x = season, y = rating_average, 
                               group = season,
                               fill = season)) +
-    geom_violindot(fill_dots = "black") +
+    geom_violindot(dots_size = 0.5, binwidth = 0.25,fill_dots = "black") +
     scale_fill_material_d()+
     xlab ("Season Number") +
     ylab ("Average Episode Rating") +
+    ylim(0,10) +
     labs(title = "Episode Rating Distribution by Season")   
 })
 
