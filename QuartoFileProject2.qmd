@@ -44,10 +44,10 @@ View(show_data)
 Contingency Tables:
 
 ```{r}
-CT <- table(show_data$type, show_data$averageRuntime, show_data$status)
+CT <- table(show_data$type, show_data$rating$average)
 CT
 ```
 
 ```{r}
-table(BreakingBad$)
+
 ```

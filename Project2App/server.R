@@ -34,10 +34,9 @@ shinyServer(function(input, output, session) {
     unnest_wider(rating, names_sep = "_") |>
 # now I will select only the columns that are of interest.
     select(id,name,type,language,genres, rating_average, status,runtime,premiered,
-           ended, network_name, network_country_name) |>
+           ended, network_name, network_country_name) 
 # I will now allow the user to filter by adjusting a slider and hitting "GO!"
-    filter(rating_average >= min_show())
-    
+
 # to find general information about a single show, I will subset the show data by matching the name and then ID  
   subsetted <- subset(all_shows, name == show_name())
   id <- subsetted$id
@@ -47,8 +46,10 @@ shinyServer(function(input, output, session) {
     output$columns <- renderUI({
     checkboxGroupInput("CB", "Select Columns to Keep for Download", 
                        choices = colnames(all_shows),
-                       selected = colnames(all_shows)) })
-    return(all_shows)
+                       selected = colnames(all_shows))})
+    shows_rated <- all_shows |>
+      filter(rating_average >= min_show())
+    return(shows_rated)
   }
 # when the endpoint is specified to general, we will not update the url and instead just return 
 # the subsetted data.
@@ -114,7 +115,7 @@ shinyServer(function(input, output, session) {
  
  output$summary <- DT::renderDataTable({
    reactive_data() |> select(input$CB)
- })
+ }) 
  
  # this is how we will download the data
 output$downloadData <- downloadHandler(
