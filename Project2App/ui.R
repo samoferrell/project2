@@ -75,7 +75,7 @@ shinyUI(fluidPage(
            sidebarLayout(
              sidebarPanel(
                selectInput("tabs", "What are you interested in?", 
-                           choices = c("Numerical Summaries across Genders" = "numeric",
+                           choices = c("Numerical Summaries across Genres" = "numeric",
                                        "Contingency Tables" = "tables",
                                        "Plots" = "plots"),
                            selected = "numeric"),
@@ -88,7 +88,12 @@ shinyUI(fluidPage(
                                               "Thriller", "War", "Western"))),
                conditionalPanel("input.tabs == 'tables'",
                                 checkboxGroupInput("table_vars", "Contingency Table Variables:",
-                                                   choices = c("status", "type", "runtime")))
+                                                   choices = c("status", "type", "runtime", "language", "rating")),
+                                p("Rating Classification:"),
+                                p("0 - 2.5 = bad"),
+                                p("2.6 - 5 = poor"),
+                                p("5.1 - 7.5 = good"),
+                                p("7.6 - 10 = great"))
              ),
              mainPanel(
                conditionalPanel("input.tabs == 'numeric'",

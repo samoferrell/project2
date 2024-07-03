@@ -170,8 +170,24 @@ output$tables <- renderPrint({
   data <- all_shows |>
     unnest_wider(rating, names_sep = "_") |>
     unnest_wider(schedule, names_sep = "_") |>
-    select(name,type,language, status, runtime,genres,rating_average, schedule_days)
-  table <- table(data$status, data$type)
-  print(table)
+    select(name,type,language, status, runtime,genres,rating_average, schedule_days) |>
+    mutate(rating = case_when(
+      rating_average >= 0 & rating_average <= 2.5 ~ "Bad",
+      rating_average > 2.5 & rating_average <= 5 ~ "Poor",
+      rating_average > 5 & rating_average <= 7.5 ~ "Good",
+      rating_average > 7.5 & rating_average <= 10 ~ "Great"))
+  if (length(input$table_vars) == 2) {
+    table <- table(data[[input$table_vars[1]]], 
+                   data[[input$table_vars[2]]])
+    print(table)
+  } 
+  else if (length(input$table_vars) == 3) {
+    table <- table(data[[input$table_vars[1]]], 
+                   data[[input$table_vars[2]]], 
+                   data[[input$table_vars[3]]])
+    print(table)
+  }
+  else {
+    print("Select 2 to 3 variables")}
 })
 })
