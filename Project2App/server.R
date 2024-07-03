@@ -13,7 +13,7 @@ shinyServer(function(input, output, session) {
   RB <- eventReactive(input$submit, {input$RB})
   min_show <- eventReactive(input$submit, {input$min_show})
   min_ep <- eventReactive(input$submit, {input$min_ep})
-  #selected_genres <- input$selected_genres
+  #selected_genres <- reactive(input$selected_genres)
   
 # I will create my data to generate when the submit button is hit. 
 # This will also allow the data to be downloaded because I can call
@@ -133,17 +133,45 @@ output$downloadData <- downloadHandler(
 ###################################
 
 ###### Numerical Show Summaries #########
-#output$genre_data DT::renderDataTable({
-#url <- "https://api.tvmaze.com/shows"
-#id_info <- httr::GET(url)
-#parsed <- fromJSON(rawToChar(id_info$content))
-#all_shows <- tibble::as_tibble(parsed)
-#filtered <- all_shows |>
- # unnest_wider(rating, names_sep = "_") |>
-  # now I will select only the columns that are of interest.
-  #select(name,genres,rating_average) |>
-  #filter(map_lgl(genres, ~ all(genre_vector %in% .x)))
+output$genre_data <- DT::renderDataTable({
+url <- "https://api.tvmaze.com/shows"
+id_info <- httr::GET(url)
+parsed <- fromJSON(rawToChar(id_info$content))
+all_shows <- tibble::as_tibble(parsed)
+filtered <- all_shows |>
+ unnest_wider(rating, names_sep = "_") |>
+  select(name,genres,rating_average) |>
+  filter(map_lgl(genres, ~ all(input$selected_genres %in% .x)))
+filtered
+})
+output$summary_table <- renderPrint({
+  url <- "https://api.tvmaze.com/shows"
+  id_info <- httr::GET(url)
+  parsed <- fromJSON(rawToChar(id_info$content))
+  all_shows <- tibble::as_tibble(parsed)
+  filtered <- all_shows |>
+    unnest_wider(rating, names_sep = "_") |>
+    select(name,genres,rating_average) |>
+    filter(map_lgl(genres, ~ all(input$selected_genres %in% .x)))
 
-#average <- mean(filtered$rating_average)
-
+  summary_table <- data.frame(
+    Mean = round(mean(filtered$rating_average),2),
+    Median = round(median(filtered$rating_average),2),
+    SD = round(sd(filtered$rating_average),2)
+  )
+  print(summary_table)
+})  
+###### Contingency Tables #########
+output$tables <- renderPrint({
+  url <- "https://api.tvmaze.com/shows"
+  id_info <- httr::GET(url)
+  parsed <- fromJSON(rawToChar(id_info$content))
+  all_shows <- tibble::as_tibble(parsed)
+  data <- all_shows |>
+    unnest_wider(rating, names_sep = "_") |>
+    unnest_wider(schedule, names_sep = "_") |>
+    select(name,type,language, status, runtime,genres,rating_average, schedule_days)
+  table <- table(data$status, data$type)
+  print(table)
+})
 })

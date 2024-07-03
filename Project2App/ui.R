@@ -70,23 +70,45 @@ shinyUI(fluidPage(
       dataTableOutput("summary")
     )
     )),
+  # data exploration tab, mainPanel and sidebarPanel changes when condition is met:
   tabPanel("Data Exploration",
            sidebarLayout(
              sidebarPanel(
-               checkboxGroupInput("selected_genres", "Select Genres:",
+               selectInput("tabs", "What are you interested in?", 
+                           choices = c("Numerical Summaries across Genders" = "numeric",
+                                       "Contingency Tables" = "tables",
+                                       "Plots" = "plots"),
+                           selected = "numeric"),
+               conditionalPanel("input.tabs == 'numeric'",
+                            checkboxGroupInput("selected_genres", "Select Genres:",
                                   choices = c("Action", "Adventure", "Anime", "Comedy", "Crime", 
                                               "Drama", "Espionage", "Family", "Fantasy", "History", 
                                               "Horror", "Legal", "Medical", "Music", "Mystery", 
                                               "Romance", "Science-Fiction", "Sports", "Supernatural", 
-                                              "Thriller", "War", "Western"))
+                                              "Thriller", "War", "Western"))),
+               conditionalPanel("input.tabs == 'tables'",
+                                checkboxGroupInput("table_vars", "Contingency Table Variables:",
+                                                   choices = c("status", "type", "runtime")))
              ),
              mainPanel(
-             )
-           )
+               conditionalPanel("input.tabs == 'numeric'",
+               h4("All Shows Filtered by Selected Genre"),
+               dataTableOutput("genre_data"),
+               br(),
+               h4("Summary Statistics for Ratings across Selected Genres"),
+               verbatimTextOutput("summary_table")),
+               conditionalPanel("input.tabs == 'tables'",
+                                h4("Contingiency Tables"),
+                                verbatimTextOutput("tables"))
+             ),
+             
+               
+             ))
+           
   
   
   
   
-    ))))
+    )))
   
 
