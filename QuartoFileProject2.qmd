@@ -64,7 +64,10 @@ CT <- table(show_data$type, show_data$network$country$name, show_data$schedule$d
 – You should create at least four plots utilizing coloring, grouping, etc. All plots should have nice labels and titles.
 
     average show rating based on premiered year - grouped and colored by type
+    
     episode trend rating faceted by season
+    
+    genre count for shows
     
     ** special plot **
     half violin - half dot plot = vertical distribution for age and 
