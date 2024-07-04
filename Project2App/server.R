@@ -155,13 +155,18 @@ output$summary_table <- renderPrint({
     unnest_wider(rating, names_sep = "_") |>
     select(name,genres,rating_average) |>
     filter(map_lgl(genres, ~ all(input$selected_genres %in% .x)))
+summary_table <- round(match.fun(input$stats)(filtered$rating_average),2)
 
-  summary_table <- data.frame(
-    Mean = round(mean(filtered$rating_average),2),
-    Median = round(median(filtered$rating_average),2),
-    SD = round(sd(filtered$rating_average),2)
-  )
-  print(summary_table)
+if (input$stats %in% c("mean", "median")){
+  print(c(input$stats,summary_table))
+}
+else if (input$stats == "max"){print(c(input$stats, 
+                                       summary_table, 
+                                       filtered$name[which.max(filtered$rating_average)]))}
+else if (input$stats == "min"){print(c(input$stats,
+                                       summary_table,
+                                       filtered$name[which.min(filtered$rating_average)]))}
+
 })  
 ###### Contingency Tables #########
 output$tables <- renderPrint({
@@ -316,12 +321,6 @@ output$cast_plot <- renderPlot({
       shape = "Status"
     )  
 
-  
-  
-  
 })
-
-
-
 
 })
