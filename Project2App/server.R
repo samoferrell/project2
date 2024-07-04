@@ -277,10 +277,10 @@ output$cast_plot <- renderPlot({
       )
     )
   ggplot(cast, aes(x = age, y = person_gender, color = person_gender, shape = died)) +
-    geom_point(size = 4) +
+    geom_point(size = 6) +
     scale_color_manual(values = c("Male" = "blue", "Female" = "red")) +
     scale_y_discrete(limits = c("Male", "Female")) +
-    scale_shape_manual(values = c("alive" = 1, "deceased" = 10)) +
+    scale_shape_manual(values = c("alive" = 79, "deceased" = 88)) +
     labs(
       x = "Age",
       y = "Gender",
