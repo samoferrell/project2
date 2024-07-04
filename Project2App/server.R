@@ -262,7 +262,32 @@ output$cast_plot <- renderPlot({
   cast_info <- httr::GET(new_url)
   cast_parsed <- fromJSON(rawToChar(cast_info$content))
   show_cast <- tibble::as_tibble(cast_parsed)
-  
+  cast <- show_cast |>
+    unnest_wider(person, names_sep = "_") |>
+    select(person_name, person_gender, person_birthday, person_deathday) |>
+    filter(!is.na(person_gender)) |>
+    mutate(
+      person_birthday = ymd(person_birthday),
+      person_deathday = ymd(person_deathday),
+      died = ifelse(!is.na(person_deathday),"deceased","alive"),
+      age = ifelse(
+        !is.na(person_deathday),
+        as.integer(difftime(person_deathday, person_birthday) / 365),
+        as.integer(difftime(ymd("2024-06-30"), person_birthday) / 365)
+      )
+    )
+  ggplot(cast, aes(x = age, y = person_gender, color = person_gender, shape = died)) +
+    geom_point(size = 4) +
+    scale_color_manual(values = c("Male" = "blue", "Female" = "red")) +
+    scale_y_discrete(limits = c("Male", "Female")) +
+    scale_shape_manual(values = c("alive" = 1, "deceased" = 10)) +
+    labs(
+      x = "Age",
+      y = "Gender",
+      title = "Age Distribution of Cast by Gender and Deceased Status",
+      color = "Gender",
+      shape = "Status"
+    )  
 
   
   

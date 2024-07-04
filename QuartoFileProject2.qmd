@@ -163,8 +163,27 @@ cast <- bones_cast |>
       as.integer(difftime(ymd("2024-06-30"), person_birthday) / 365)
     )
   )
-View(cast)
 ```
+
+
+```{r}
+ggplot(cast, aes(x = age, y = person_gender, color = person_gender, shape = died)) +
+  geom_point(size = 3.5) +
+  scale_color_manual(values = c("Male" = "blue", "Female" = "red")) +
+  scale_y_discrete(limits = c("Male", "Female")) +
+  scale_shape_manual(values = c("alive" = 1, "deceased" = 10)) +
+  labs(
+    x = "Age",
+    y = "Gender",
+    title = "Age Distribution of Cast by Gender and Deceased Status",
+    color = "Gender",
+    shape = "Status"
+  )
+```
+
+
+
+
 
 
 ```{r}
