@@ -183,6 +183,51 @@ ggplot(cast, aes(x = age, y = person_gender, color = person_gender, shape = died
 
 
 
+SEASON GRAPHS:
+```{r}
+ep_ratings <- search_show(show_name = "Game of Thrones", endpoint = "episodes")
+eps <- ep_ratings |>
+        unnest_wider(rating, names_sep = "_") |>
+  select(season, number, rating_average) |>
+  group_by(season) %>%                        
+  summarise(mean_rating = mean(rating_average, na.rm = TRUE))
+seasons <- search_show(show_name = "Game of Thrones", endpoint = "seasons")
+season_ratings <- seasons |>
+          unnest_wider(image, names_sep = "_") |>
+  select(number, image_original) |>
+  rename("season" = "number") |>
+  left_join(eps, by = "season") |>
+  mutate(season = as.factor(season))
+```
+
+```{r}
+ggplot(season_ratings, aes(x = season, y = mean_rating, fill = season)) +
+  geom_bar(stat = "identity") +
+  labs(
+    x = "Season",
+    y = "Episode Average",
+    title = "Episode Average across Seasons")
+```
+
+
+```{r}
+ggplot(season_ratings, aes(x = season, y = mean_rating)) +
+  geom_bar(stat = "identity") +
+  geom_image(aes(image = image_original, y = 0), size = 0.31) + 
+  labs(title = "Mean Episode Rating Across Seasons") +
+  scale_y_continuous(limits = c(0,10), expand = c(0, 0)) 
+
+```
+
+
+```{r}
+library(ggimage)
+library(jpeg)
+```
+```{r}
+
+```
+
 
 
 

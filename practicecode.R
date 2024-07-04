@@ -26,6 +26,7 @@ library(tidyr)
 episode_info <- info |>
   unnest_wider(rating, names_sep = "_") |>
   select(name, season, number, type, airdate, runtime, rating_average)
+
 View(episode_info)
 
 search_show <- function(url = "https://api.tvmaze.com/shows", show_name, endpoint){

@@ -223,12 +223,27 @@ output$show_rating_plot <- renderPlot({
   subsetted <- subset(all_shows, name == input$show_eps)
   id <- subsetted$id 
   new_url <- paste0(url, "/", id, "/", "episodes")
+  season_url <- paste0(url, "/", id, "/", "seasons")
+  season_info <-httr::GET(season_url)
+  season_parsed <- fromJSON(rawToChar(season_info$content))
+  all_season <- tibble::as_tibble(season_parsed)
+  season_data <- all_season |>
+    mutate(season = as.factor(number))
+  
   ep_info <- httr::GET(new_url)
   ep_parsed <- fromJSON(rawToChar(ep_info$content))
   all_eps <- tibble::as_tibble(ep_parsed)
   episode_ratings <- all_eps |>
     unnest_wider(rating, names_sep = "_") |>
     mutate(season = as.factor(season))
+
+  seasons <- left_join(season_data, episode_ratings |>
+                         group_by(season) |>                       
+                         summarise(mean_rating = mean(rating_average, na.rm = TRUE)),
+                       by = "season")
+  
+  if (input$season_avg == "no"){
+    
   g <- ggplot(episode_ratings, aes(x = season, y = rating_average, 
                               group = season,
                               fill = season)) +
@@ -238,6 +253,18 @@ output$show_rating_plot <- renderPlot({
     ylab ("Average Episode Rating") +
     ylim(0,10) +
     labs(title = "Episode Rating Distribution by Season")
+  }
+  else if (input$season_avg == "yes"){
+    g <- ggplot(seasons, aes(x = season, y = mean_rating, fill = season)) +
+      geom_bar(stat = "identity") +
+      ylim(0,10) +
+      labs(
+        x = "Season",
+        y = "Episode Average",
+        title = "Episode Average across Seasons")
+    
+    
+  }
   if (input$facet == "no"){
   g
     }
