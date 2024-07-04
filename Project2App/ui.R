@@ -93,7 +93,17 @@ shinyUI(fluidPage(
                                 p("0 - 2.5 = bad"),
                                 p("2.6 - 5 = poor"),
                                 p("5.1 - 7.5 = good"),
-                                p("7.6 - 10 = great"))
+                                p("7.6 - 10 = great")),
+               conditionalPanel("input.tabs == 'plots'",
+                                radioButtons("RBplots", "Select a Plot Below",
+                                             choiceNames = c("Episode Ratings by Season","Show Ratings by Year and Type", "Cast Plot"), 
+                                             choiceValues = c("choice_ep", "choice_show", "choice_cast"))),
+               conditionalPanel("input.tabs == 'plots' && input.RBplots == 'choice_ep'",
+                                radioButtons("facet", "Facet Plots by Season?",
+                                             choiceNames = c("Yes","No"), 
+                                             choiceValues = c("yes", "no"),
+                                             selected = "no"))
+                                
              ),
              mainPanel(
                conditionalPanel("input.tabs == 'numeric'",
@@ -105,12 +115,18 @@ shinyUI(fluidPage(
                conditionalPanel("input.tabs == 'tables'",
                                 h4("Contingiency Tables"),
                                 verbatimTextOutput("tables")),
-               conditionalPanel("input.tabs == 'plots'",
+               conditionalPanel("input.tabs == 'plots' && (input.RBplots == 'choice_ep' || input.RBplots == 'choice_cast')",
                                 textInput("show_eps", "Name of Show", 
                                           value = "", 
                                           width = NULL, 
-                                          placeholder = "Enter show name, try: 'Game of Thrones'"),
-                                plotOutput("show_rating_plot"))
+                                          placeholder = "Enter show name, try: 'Game of Thrones'")),
+               conditionalPanel("input.tabs == 'plots' && input.RBplots == 'choice_ep'",
+                                plotOutput("ep_rating_plot")),
+               conditionalPanel("input.tabs == 'plots' && input.RBplots == 'choice_show'",
+                                plotOutput("show_rating_plot")),
+               conditionalPanel("input.tabs == 'plots' && input.RBplots == 'choice_cast'",
+                                plotOutput("cast_plot"))
+               
                
                ),
              

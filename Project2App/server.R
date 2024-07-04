@@ -197,17 +197,21 @@ output$tables <- renderPrint({
 output$show_rating_plot <- renderPlot({
   
  # average show rating based on premiered year - grouped and colored by type
-#  url <- "https://api.tvmaze.com/shows"
-#  id_info <- httr::GET(url)
-#  parsed <- fromJSON(rawToChar(id_info$content))
-#  all_shows <- tibble::as_tibble(parsed)
-#  data <- all_shows |>
-#    unnest_wider(rating, names_sep = "_") |>
-#    mutate(year = substr(premiered,1,4))
+  url <- "https://api.tvmaze.com/shows"
+  id_info <- httr::GET(url)
+  parsed <- fromJSON(rawToChar(id_info$content))
+  all_shows <- tibble::as_tibble(parsed)
+  data <- all_shows |>
+    unnest_wider(rating, names_sep = "_") |>
+    mutate(year = substr(premiered,1,4))
   
-#  ggplot(data, aes(x = year, y = rating_average)) +
-#  geom_point()
-
+  ggplot(data, aes(x = year, y = rating_average, color = type)) +
+  geom_point(size = 3) +
+    theme_minimal() +
+    scale_color_manual(values = c("green","blue","pink","black","red"))
+})
+  output$ep_rating_plot <- renderPlot({
+    
   url <- "https://api.tvmaze.com/shows"
   id_info <- httr::GET(url)
   parsed <- fromJSON(rawToChar(id_info$content))
@@ -225,8 +229,7 @@ output$show_rating_plot <- renderPlot({
   episode_ratings <- all_eps |>
     unnest_wider(rating, names_sep = "_") |>
     mutate(season = as.factor(season))
-  
-  ggplot(episode_ratings, aes(x = season, y = rating_average, 
+  g <- ggplot(episode_ratings, aes(x = season, y = rating_average, 
                               group = season,
                               fill = season)) +
     geom_violindot(dots_size = 0.5, binwidth = 0.25,fill_dots = "black") +
@@ -234,10 +237,37 @@ output$show_rating_plot <- renderPlot({
     xlab ("Season Number") +
     ylab ("Average Episode Rating") +
     ylim(0,10) +
-    labs(title = "Episode Rating Distribution by Season")   
+    labs(title = "Episode Rating Distribution by Season")
+  if (input$facet == "no"){
+  g
+    }
+  else if (input$facet == "yes"){
+    g + 
+      facet_wrap(~ season)
+  }
 })
 
+output$cast_plot <- renderPlot({
+  url <- "https://api.tvmaze.com/shows"
+  id_info <- httr::GET(url)
+  parsed <- fromJSON(rawToChar(id_info$content))
+  all_shows <- tibble::as_tibble(parsed)
+  
+  # I will now allow the user to filter by adjusting a slider and hitting "GO!"
+  
+  # to find general information about a single show, I will subset the show data by matching the name and then ID  
+  subsetted <- subset(all_shows, name == input$show_eps)
+  id <- subsetted$id 
+  new_url <- paste0(url, "/", id, "/", "cast")
+  cast_info <- httr::GET(new_url)
+  cast_parsed <- fromJSON(rawToChar(cast_info$content))
+  show_cast <- tibble::as_tibble(cast_parsed)
+  
 
+  
+  
+  
+})
 
 
 

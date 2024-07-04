@@ -132,7 +132,8 @@ ggplot(episode_ratings, aes(x = season, y = rating_average,
   scale_fill_material_d()+
   xlab ("Season Number") +
   ylab ("Average Episode Rating") +
-  labs(title = "Episode Rating Distribution by Season")
+  labs(title = "Episode Rating Distribution by Season") +
+  facet_wrap(~ season)
 
   
 
@@ -143,6 +144,27 @@ ggplot(episode_ratings, aes(x = season, y = rating_average,
 
 genre count for shows (after viewing it may not work, too many distinct genre combinations)
 
+```{r}
+library(lubridate)
+```
+
+```{r}
+bones_cast <- search_show(show_name = "Glee", endpoint = "cast")
+cast <- bones_cast |>
+  unnest_wider(person, names_sep = "_") |>
+  select(person_name, person_gender, person_birthday, person_deathday) |>
+  mutate(
+    person_birthday = ymd(person_birthday),
+    person_deathday = ymd(person_deathday),
+    died = ifelse(!is.na(person_deathday),"deceased","alive"),
+    age = ifelse(
+      !is.na(person_deathday),
+      as.integer(difftime(person_deathday, person_birthday) / 365),
+      as.integer(difftime(ymd("2024-06-30"), person_birthday) / 365)
+    )
+  )
+View(cast)
+```
 
 
 ```{r}
