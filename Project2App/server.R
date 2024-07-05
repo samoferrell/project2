@@ -9,7 +9,13 @@ library(see)
 library(ggplot2)
 
 shinyServer(function(input, output, session) {
-# all my reactive events are below:
+
+  
+  
+  
+  
+  
+  # all my reactive events are below:
   endpoint <- eventReactive(input$submit, {input$endpoint})
   show_name <- eventReactive(input$submit, {input$show_name})
   RB <- eventReactive(input$submit, {input$RB})
