@@ -49,8 +49,22 @@ shinyServer(function(input, output, session) {
   RB <- eventReactive(input$submit, {input$RB})
   min_show <- eventReactive(input$submit, {input$min_show})
   min_ep <- eventReactive(input$submit, {input$min_ep})
-  #selected_genres <- reactive(input$selected_genres)
+
+  # I will create my data to generate when the submit button is hit. 
+  # This will also allow the data to be downloaded because I can call
+  # the reactive data easily
   
+  # for all the endpoints, we create checkboxes based on the current columns 
+  # for the user to specify and keep
+  
+ # all my reactive events are below:
+  endpoint <- eventReactive(input$submit, {input$endpoint})
+  show_name <- eventReactive(input$submit, {input$show_name})
+  RB <- eventReactive(input$submit, {input$RB})
+  min_show <- eventReactive(input$submit, {input$min_show})
+  min_ep <- eventReactive(input$submit, {input$min_ep})
+
+
   # I will create my data to generate when the submit button is hit. 
   # This will also allow the data to be downloaded because I can call
   # the reactive data easily
@@ -61,7 +75,6 @@ shinyServer(function(input, output, session) {
   reactive_data <- eventReactive(input$submit, {
     
     # first I will start with a url and access the main show data
-    
     all_shows <- search_show()  |> 
       # a lot of the columns are saved as a list / data frame so I will expand them:
       unnest_wider(network, names_sep = "_") |>
@@ -95,16 +108,10 @@ shinyServer(function(input, output, session) {
                            choices = colnames(subsetted),
                            selected = colnames(subsetted)) })
       return(subsetted)} 
-    # for all other endpoints specified, we will update the url  
-    else {
-      new_url <- paste0(url, "/", id, "/", endpoint())}
-    id_info_specific <- httr::GET(new_url)
-    parsed_specific <- fromJSON(rawToChar(id_info_specific$content))
-    info_specific <- tibble::as_tibble(parsed_specific)
     
     # for our cast endpoint, we will expand the data frame and select only the specified columns        
     if (endpoint() == "cast"){
-      cast_info <- info_specific |>
+      cast_info <- search_show(show_name = show_name(), endpoint = endpoint()) |>
         unnest_wider(col = person, names_sep = "_") |>
         unnest_wider(col = character, names_sep = "_") |>
         select(person_name,person_birthday,person_deathday,person_gender,character_name,self)
@@ -125,7 +132,7 @@ shinyServer(function(input, output, session) {
     
     # for our seasons endpoint, we will select our specified columns. 
     if (endpoint() == "seasons"){
-      season_info <- info_specific |>
+      season_info <- search_show(show_name = show_name(), endpoint = endpoint()) |>
         select(number, episodeOrder, premiereDate, endDate)
       output$columns <- renderUI({
         checkboxGroupInput("CB", "Select Columns to Keep for Download", 
@@ -137,7 +144,7 @@ shinyServer(function(input, output, session) {
     # rating value 
     
     if (endpoint() == "episodes"){
-      episode_info <- info_specific |>
+      episode_info <- search_show(show_name = show_name(), endpoint = endpoint()) |>
         unnest_wider(rating, names_sep = "_") |>
         select(name, season, number, type, airdate, runtime, rating_average)
       output$columns <- renderUI({
@@ -147,7 +154,6 @@ shinyServer(function(input, output, session) {
       episode_info <- episode_info |>
         filter(rating_average >= min_ep())
       return(episode_info)}
-    
   })
   
   output$summary <- DT::renderDataTable({
@@ -164,6 +170,7 @@ shinyServer(function(input, output, session) {
       write.csv(reactive_data() |> select(input$CB), 
                 file, row.names = FALSE)
     })
+  
   
   # TAB 3
   ###################################
