@@ -64,17 +64,20 @@ shinyUI(fluidPage(
                                               selected = "general"),
                                   br()
                  ),
+                 # this gives us a slider input for all shows
                  conditionalPanel("input.RB == 'all'",
                                   sliderInput("min_show", "Minimum Show Rating (0 to 10)" ,
                                               min=0, max=10,value=0 ,animate=FALSE,step=0.1)),
+                 # this gives us a slider input for episodes of a specific show
                  conditionalPanel("input.endpoint == 'episodes' && input.RB == 'specific'",
                                   sliderInput("min_ep", "Minimum Episode Rating (0 to 10)" ,
                                               min=0, max=10,value=0 ,animate=FALSE,step=0.1)),
-                 
+                 # this is a select input to specify a gender
                  conditionalPanel("input.endpoint == 'cast' && input.RB == 'specific'", 
                                   selectInput("gender", label = "Gender to keep?", 
                                               choices = c("Both", "Male", "Female"),
                                               selected = "Both")),
+                 # this is how I am updating the columns to select
                  uiOutput("columns"),
                  
                  
@@ -96,13 +99,15 @@ shinyUI(fluidPage(
                                          "Plots" = "plots"),
                              selected = "numeric"),
                  conditionalPanel("input.tabs == 'numeric'",
-                                  checkboxGroupInput("selected_genres", "Select Genres:",
+                                 # this allows the user to select the genre
+                                   checkboxGroupInput("selected_genres", "Select Genres:",
                                                      choices = c("Action", "Adventure", "Anime", "Comedy", "Crime", 
                                                                  "Drama", "Espionage", "Family", "Fantasy", "History", 
                                                                  "Horror", "Legal", "Medical", "Music", "Mystery", 
                                                                  "Romance", "Science-Fiction", "Sports", "Supernatural", 
                                                                  "Thriller", "War", "Western")),
-                                  radioButtons("stats", "What Summary Statistic?", 
+                                 # these are the summary statistic options 
+                                 radioButtons("stats", "What Summary Statistic?", 
                                                choiceNames = c("Mean", "Median", "Max", "Min"),
                                                choiceValues = c("mean", "median", "max", "min"))),
                  conditionalPanel("input.tabs == 'tables'",
@@ -113,6 +118,7 @@ shinyUI(fluidPage(
                                   p("2.6 - 5 = poor"),
                                   p("5.1 - 7.5 = good"),
                                   p("7.6 - 10 = great")),
+                 # these following conditional panels are for the plots
                  conditionalPanel("input.tabs == 'plots'",
                                   radioButtons("RBplots", "Select a Plot Below",
                                                choiceNames = c("Episode Ratings by Season","Show Ratings by Year and Type", "Cast Plot"), 
@@ -129,6 +135,7 @@ shinyUI(fluidPage(
                  
                ),
                mainPanel(
+                 # These are the main conditional panels for the plots
                  conditionalPanel("input.tabs == 'numeric'",
                                   h4("All Shows Filtered by Selected Genre"),
                                   dataTableOutput("genre_data"),
@@ -149,17 +156,9 @@ shinyUI(fluidPage(
                                   plotOutput("show_rating_plot")),
                  conditionalPanel("input.tabs == 'plots' && input.RBplots == 'choice_cast'",
                                   plotOutput("cast_plot"))
-                 
-                 
                ),
                
-               
              ))
-    
-    
-    
-    
-    
   )))
 
 
