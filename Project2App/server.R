@@ -174,6 +174,7 @@ shinyServer(function(input, output, session) {
     filtered <- all_shows |>
       unnest_wider(rating, names_sep = "_") |>
       select(name,genres,rating_average) |>
+      # I will use the input$selected_genres to filter the genres by utilizing a logical mapping with %in%
       filter(map_lgl(genres, ~ all(input$selected_genres %in% .x)))
     filtered
   })
@@ -184,7 +185,8 @@ shinyServer(function(input, output, session) {
       select(name,genres,rating_average) |>
       filter(map_lgl(genres, ~ all(input$selected_genres %in% .x)))
     summary_table <- round(match.fun(input$stats)(filtered$rating_average),2)
-    
+  # after repeating the filtering for the data table rendering, I will now match the requested function with what is inputted in the UI
+  # and then I will calculate that function, for the max and min,  I will also print the name of the show with that statistic
     if (input$stats %in% c("mean", "median")){
       print(c(input$stats,summary_table))
     }
@@ -208,6 +210,8 @@ shinyServer(function(input, output, session) {
         rating_average > 2.5 & rating_average <= 5 ~ "Poor",
         rating_average > 5 & rating_average <= 7.5 ~ "Good",
         rating_average > 7.5 & rating_average <= 10 ~ "Great"))
+    # I want the contingency tables to only print when there are exactly 2 or 3 inputs selected. I can manually code the tables,
+    # for each of those options. So, when two are selected, we will access both elements, and when 3 are, we will access the 3 elements
     if (length(input$table_vars) == 2) {
       table <- table(data[[input$table_vars[1]]], 
                      data[[input$table_vars[2]]])
@@ -238,21 +242,21 @@ shinyServer(function(input, output, session) {
       scale_color_manual(values = c("green","blue","pink","black","red"))
   })
   output$ep_rating_plot <- renderPlot({
-    
+    # first I will accesss the season data 
     all_season <- search_show(show_name = input$show_eps, endpoint = "seasons")
     season_data <- all_season |>
       mutate(season = as.factor(number))
-    
+    # now i will access the episode data
     all_eps <- search_show(show_name = input$show_eps, endpoint = "episodes")
     episode_ratings <- all_eps |>
       unnest_wider(rating, names_sep = "_") |>
       mutate(season = as.factor(season))
-    
+    # now i will join these and within the episode rating, I will group by season and find the rating average
     seasons <- left_join(season_data, episode_ratings |>
                            group_by(season) |>                       
                            summarise(mean_rating = mean(rating_average, na.rm = TRUE)),
                          by = "season")
-    
+    # now i will code a half violing/dot plot 
     if (input$season_avg == "no"){
       
       g <- ggplot(episode_ratings, aes(x = season, y = rating_average, 
@@ -265,6 +269,7 @@ shinyServer(function(input, output, session) {
         ylim(0,10) +
         labs(title = "Episode Rating Distribution by Season")
     }
+    # this will be a bar plot based on season averages
     else if (input$season_avg == "yes"){
       g <- ggplot(seasons, aes(x = season, y = mean_rating, fill = season)) +
         geom_bar(stat = "identity") +
@@ -276,6 +281,7 @@ shinyServer(function(input, output, session) {
       
       
     }
+    # this controls the faceting, wrapping by season
     if (input$facet == "no"){
       g
     }
@@ -286,13 +292,14 @@ shinyServer(function(input, output, session) {
   })
   
   output$cast_plot <- renderPlot({
-    
+    # in my last plot I will create a plot of the different ages of the cast members, separated by gender and deceased status
     show_cast <- search_show(show_name = input$show_eps, endpoint = "cast")
     cast <- show_cast |>
       unnest_wider(person, names_sep = "_") |>
       select(person_name, person_gender, person_birthday, person_deathday) |>
       filter(!is.na(person_gender)) |>
       mutate(
+        # i will use the lubridate package to calculate the age of the cast members
         person_birthday = ymd(person_birthday),
         person_deathday = ymd(person_deathday),
         died = ifelse(!is.na(person_deathday),"deceased","alive"),
@@ -302,6 +309,7 @@ shinyServer(function(input, output, session) {
           as.integer(difftime(ymd("2024-06-30"), person_birthday) / 365)
         )
       )
+    # here is the coding of the plot, I have specified shapes for status and color for gender
     ggplot(cast, aes(x = age, y = person_gender, color = person_gender, shape = died)) +
       geom_point(size = 6) +
       scale_color_manual(values = c("Male" = "blue", "Female" = "red")) +

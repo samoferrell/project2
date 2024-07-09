@@ -3,6 +3,22 @@ library(DT)
 library(caret)
 
 
+# while this looks like there are only 4 endpoints, when I construct the url to parse, I am combining
+# the show id prior to each of the 4 endpoints. So, since there are 240 shows, this app allows the user to look through
+# 960 endpoints:
+# .../id/endpoint so for instance, our url will be in the form:
+
+# .../1/cast
+# .../1/seasons
+# .../1/episodes
+# .../1  <- this gives the general information about the show
+# .../2/cast
+# .../2/seasons
+# .../2/episodes
+# .../2
+# ...
+
+
 # Define UI for application that draws a histogram
 shinyUI(fluidPage(
   
@@ -26,22 +42,22 @@ shinyUI(fluidPage(
         summarized via numerical and graphical summaries."),
                tags$img(src = 'tvshowcollage.png', align = "center", width = "600px", length = "900px")
                
-               
              )         
     ),
     # Data Download Tab
     tabPanel("Data Query and Download",
              sidebarLayout(
                sidebarPanel(
+                 # this radio button specifies if a user is interested in a specific show or wants information about all shows
                  radioButtons("RB", "Select a Choice Below",
                               choiceNames = c("Return All Shows","Specific Show Search"), 
                               choiceValues = c("all", "specific")),
-                 
+                 # this allows the user to input the name of their show and specify an endpoint of the url
                  conditionalPanel("input.RB == 'specific'", 
                                   textInput("show_name", "Name of Show", 
                                             value = "", 
                                             width = NULL, 
-                                            placeholder = "Enter show name"),
+                                           placeholder = "Enter show name"),
                                   br(),
                                   selectInput("endpoint", label = "What are you interested in?", 
                                               choices = c("general", "episodes", "cast", "seasons"),
